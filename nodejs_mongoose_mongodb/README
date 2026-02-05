@@ -1,1 +1,5 @@
 https://www.youtube.com/watch?v=30p9QfybWZg
+
+# .env:
+#PORT = 8000
+#MONGO_URL = "mongodb://localhost:27017/"
