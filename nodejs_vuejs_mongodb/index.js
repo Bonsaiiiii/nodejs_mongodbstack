@@ -6,8 +6,8 @@ const cors = require("cors");
 const app = express();
 app.use(cors());
 
-const CONNECTION_STRING = "mongodb+srv://zerodois:coracaovalente@cluster0.6jdpc9w.mongodb.net/?appName=Cluster0";
-const DATABASENAME = "todoappdb";
+const CONNECTION_STRING = "mongodb+srv://<db_username>:<db_password>@cluster0.6jdpc9w.mongodb.net/?appName=Cluster0";
+const DATABASENAME = "todoappdb"; //database name
 
 let database;
 
@@ -25,3 +25,4 @@ app.listen(5038, async () => {
         console.error("Mongo DB Connection Failed:", err);
     }
 });
+
