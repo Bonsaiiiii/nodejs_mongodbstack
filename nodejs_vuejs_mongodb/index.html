@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Todo App</title>
+
+  <!-- Vue -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+  <!-- Axios -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
+    integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+    }
+
+    .app {
+      background: white;
+      width: 380px;
+      padding: 25px;
+      border-radius: 14px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    input {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    button {
+      padding: 10px 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+
+    .add-btn {
+      background: #667eea;
+      color: white;
+    }
+
+    .add-btn:hover {
+      background: #556cd6;
+    }
+
+    .note {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: #f5f6fa;
+      margin-bottom: 10px;
+    }
+
+    .note span {
+      color: #333;
+      word-break: break-word;
+    }
+
+    .delete-btn {
+      background: #ff5c5c;
+      color: white;
+      font-size: 12px;
+    }
+
+    .delete-btn:hover {
+      background: #e04848;
+    }
+
+    .empty {
+      text-align: center;
+      color: #888;
+      font-size: 14px;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="app" class="app">
+    <h2>Todo App</h2>
+
+    <div class="input-group">
+      <input id="newNotes" placeholder="Write a new note..." />
+      <button class="add-btn" @click="addNewNotes()">Add</button>
+    </div>
+
+    <div v-if="notes.length === 0" class="empty">
+      No notes yet
+    </div>
+
+    <div v-for="note in notes" :key="note._id" class="note">
+      <span>{{ note.description }}</span>
+      <button class="delete-btn" @click="deleteNotes(note._id)">
+        Delete
+      </button>
+    </div>
+  </div>
+
+  <script type="module">
+    const { createApp } = Vue
+    const API_URL = "http://localhost:5038"
+
+    createApp({
+      data() {
+        return {
+          notes: []
+        }
+      },
+      methods: {
+        async refreshData() {
+          const response = await axios.get(API_URL + "/getnotes")
+          this.notes = response.data.sort((a, b) =>
+            a.description.localeCompare(b.description)
+          )
+        },
+        async addNewNotes() {
+          const input = document.getElementById("newNotes")
+          if (!input.value.trim()) return
+
+          const formData = new FormData()
+          formData.append("newNotes", input.value)
+
+          await axios.post(API_URL + "/postnotes", formData)
+          input.value = ""
+          this.refreshData()
+        },
+        async deleteNotes(_id) {
+          await axios.delete(API_URL + "/deletenotes?_id=" + _id)
+          this.refreshData()
+        }
+      },
+      mounted() {
+        this.refreshData()
+      }
+    }).mount("#app")
+  </script>
+
+</body>
+</html>
